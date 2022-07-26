@@ -2,10 +2,10 @@
     <div id="movie-card">
         <img :src="imgUrl+movie.backdrop_path" class="movie-img"/>
         <div class="text">
-            <div class="title">
+            <div class="title" @click="pushToMovieDetails(movie.id)">
                 <!-- <h5 v-if="movie.media_type">{{ movie.title }} ({{movie.release_date}})</h5> -->
-                <h5 v-if="!movie.media_type || movie.media_type == 'movie'">{{ movie.title }} ({{ movie.release_date }})</h5>
-                <h5 v-else>{{ movie.name }} ({{ movie.first_air_date }})</h5>
+                <h5 v-if="!movie.media_type || movie.media_type == 'movie'">{{ movie.title }} ({{ convert(movie.release_date) }})</h5>
+                <h5 v-else>{{ movie.name }} ({{ convert(movie.first_air_date) }})</h5>
             </div>
             <div class="details">
                 <h5>{{ movie.vote_average.toFixed(1) }} Rating</h5>
@@ -16,7 +16,7 @@
 </template>
 
 <script>
-import { IMG_URL } from './../config.js'
+import { IMG_URL, convertToYear } from './../config.js'
 
 export default {
     props: {
@@ -27,6 +27,17 @@ export default {
     data () {
         return {
             imgUrl: IMG_URL
+        }
+    },
+    methods: {
+        convert(date) {
+            return convertToYear(date)
+        },
+        pushToMovieDetails(id) {
+            this.$router.push({
+                name: 'Movie Details',
+                params: { id }
+            })
         }
     }
 }
@@ -46,6 +57,10 @@ export default {
     .title {
         h5 {
             height: 20px;
+            cursor: pointer;
+            &:hover {
+                color: #ff6161
+            }
         }
     }
 

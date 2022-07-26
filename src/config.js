@@ -5,5 +5,6 @@ export const BASE_URL = 'https://api.themoviedb.org/3'
 export const IMG_URL = 'https://image.tmdb.org/t/p/original'
 
 export function convertToYear(date) {
-    // Do some shit
+    const newDate = new Date(date)
+    return newDate.getFullYear()
 }

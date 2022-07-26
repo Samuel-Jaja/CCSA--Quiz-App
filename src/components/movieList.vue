@@ -1,6 +1,10 @@
 <template>
     <div>
-        <h3>{{heading}}</h3>
+        <div v-if="movies.length > 0" class="heading">
+            <h3>{{heading}}</h3>
+            <router-link v-if="showMore" :to="showMoreRoute">More...</router-link>
+        </div>
+            
         <div id="movie-list">
             <div class="items" v-for="movie in movies" :key="movie.id">
                 <movie-card-vue :movie="movie" />
@@ -31,6 +35,14 @@ export default {
             type: Number,
             default: 3
         },
+        showMore: {
+            type: Boolean,
+            default: true
+        },
+        showMoreRoute: {
+            type: String,
+            required: false
+        }
     },
     data () {
         return {
@@ -40,18 +52,27 @@ export default {
     mounted() {
         Axios.get(`${BASE_URL}${this.keyword}?api_key=${API_KEY}`).then(res => {
             this.movies = res.data.results.slice(0, this.numberOfMovies)
-            console.log(this.movies)
         })
     }
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
     #movie-list {
         display: flex;
         flex-wrap: wrap;
         gap: 1em;
         justify-content: space-between;
+    }
+    
+    .heading {
+        display: flex;
+        justify-content: space-between;
+        a {
+            color: #ee6060;
+            text-decoration: none;
+            margin-top: 20px;
+        }
     }
 
     .items {

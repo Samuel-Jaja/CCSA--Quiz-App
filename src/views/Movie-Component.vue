@@ -14,29 +14,54 @@
             <p>{{ movie.overview }}</p>
         </div>
     </div>
+
+    <movie-list :key="key" :showMore="false" :heading="similarObject.heading" :numberOfMovies="6" :keyword="similarObject.keyword" />
   </div>
 </template>
 
 <script>
 import Axios from 'axios'
 import { BASE_URL, API_KEY, IMG_URL } from '@/config'
+import MovieList from './../components/movieList.vue'
 
 export default {
     data() {
         return {
             movie: {},
-            imgUrl: IMG_URL
+            imgUrl: IMG_URL,
+            key: 0
         }
+    },
+    components: {
+        MovieList
     },
     computed: {
-        routeParams: function() {
-            return this.$route.params
+        routeParamsID: function() {
+            return this.$route.params.id
+        },
+        similarObject () {
+            return {
+                heading: `Similar`,
+                keyword: `/movie/${this.routeParamsID}/similar`
+            }
         }
     },
-    mounted() {
-        Axios.get(`${BASE_URL}/movie/${this.routeParams.id}?api_key=${API_KEY}`).then(res => {
-            this.movie = res.data
-        })
+    watch: {
+        routeParamsID(newVal, oldVal) {
+            this.loadMovieDetails(newVal)
+            this.key++
+        },
+    },
+    methods: {
+        loadMovieDetails: function (id) {
+            Axios.get(`${BASE_URL}/movie/${id}?api_key=${API_KEY}`).then(res => {
+                this.movie = res.data
+            })
+            window.scrollTo(0, 0)
+        }
+    },
+    created() {
+        this.loadMovieDetails(this.routeParamsID)
     }
 }
 </script>

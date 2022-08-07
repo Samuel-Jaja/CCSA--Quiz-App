@@ -2,72 +2,96 @@
   <div>
     <div v-for="(question, indx) in questions" :key="indx">
       <div v-if="currentQuestion === indx">
-        <app-question-card @checked="selectOption" :index="indx" :question="question" />
+        <app-question-card
+          @checked="selectOption"
+          :index="indx"
+          :question="question"
+        />
       </div>
     </div>
     <div class="buttons">
-      <app-button-vue v-if="currentQuestion !== 0 " @clicked="goToPrev" :style="'Danger'" :value="'Prev'" />
-      <app-button-vue v-if="currentQuestion !== questions.length-1" @clicked="goToNext" :style="'Success'" :value="'Next'" />
-      <app-button-vue v-if="currentQuestion === questions.length-1" @clicked="finishQuiz" :style="'Success'" :value="'Finish'" />
+      <app-button-vue
+        v-if="currentQuestion !== 0"
+        @clicked="goToPrev"
+        :style="'Danger'"
+        :value="'Prev'"
+      />
+      <app-button-vue
+        v-if="currentQuestion !== questions.length - 1"
+        @clicked="goToNext"
+        :style="'Success'"
+        :value="'Next'"
+      />
+      <app-button-vue
+        v-if="currentQuestion === questions.length - 1"
+        @clicked="finishQuiz"
+        :style="'Success'"
+        :value="'Finish'"
+      />
     </div>
   </div>
 </template>
 
 <script>
-import AppQuestionCard from '../components/App-Question-Card.vue'
-import AppButtonVue from '../components/App-Button.vue'
-import Axios from 'axios'
+import AppQuestionCard from "../components/App-Question-Card.vue";
+import AppButtonVue from "../components/App-Button.vue";
+import { mapGetters, mapMutations, mapState, mapActions } from "vuex";
 
 export default {
   components: {
     AppQuestionCard,
-    AppButtonVue
+    AppButtonVue,
   },
-  data () {
+  data() {
     return {
-      questions: [],
-      currentQuestion: 0
-    }
+      currentQuestion: 0,
+    };
   },
   computed: {
+    ...mapGetters(["questions", "currentQuestion"]),
+    ...mapState(["questions"]),
+
     score() {
-      return this.questions.filter(question => question.chosenAnswer === question.correct_answer)
-    }
+      return this.questions.filter(
+        (question) => question.chosenAnswer === question.correct_answer
+      );
+    },
   },
   methods: {
+    ...mapMutations(["setQuestions"]),
+    ...mapActions(["loadQuestions"]),
+
     finishQuiz: function () {
-      this.$router.push({ 
-        name: 'Score', 
-        params: { 
-          userscore: this.score.length
-        } 
-      })
+      this.$router.push({
+        name: "Score",
+        params: {
+          userscore: this.score.length,
+        },
+      });
     },
+
     selectOption: function (params) {
-      this.questions[params.qIndex].chosenAnswer = params.value
+      this.questions[params.qIndex].chosenAnswer = params.value;
     },
-    goToNext: function () {
-      this.currentQuestion = this.currentQuestion + 1
+
+    goToNext() {
+      this.currentQuestion((this.currentQuestion = this.currentQuestion + 1));
     },
     goToPrev: function () {
-      this.currentQuestion = this.currentQuestion - 1
+      this.currentQuestion((this.currentQuestion = this.currentQuestion - 1));
     },
-    async loadQuestions() {
-      const response = await Axios.get('https://opentdb.com/api.php?amount=10')
-      return response.data
-    }
   },
   mounted: async function () {
-    const data = await this.loadQuestions()
-    this.questions = data.results
-  }
-}
+    const data = await this.loadQuestions();
+    this.questions = data.results;
+  },
+};
 </script>
 
 <style lang="scss" scoped>
-  .buttons {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 20px;
-  }
+.buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
 </style>
